@@ -1,0 +1,3 @@
+name: healthd
+description: Endpoint which consumes updates from healthagents and persist them in etcd
+version: 0.1.0

@@ -1,0 +1,42 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: healthd
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      name: healthd
+  template:
+    metadata:
+      labels:
+        name: healthd
+    spec:
+      affinity:
+{{ toYaml .Values.affinity | indent 8 }}
+      containers:
+      - name: healthd
+        args:
+        - '-etcd'
+        - 'http://{{ .Release.Name }}-etcd-0.{{ .Release.Name }}-etcd:2379'
+        - '-etcd'
+        - 'http://{{ .Release.Name }}-etcd-1.{{ .Release.Name }}-etcd:2379'
+        - '-etcd'
+        - 'http://{{ .Release.Name }}-etcd-2.{{ .Release.Name }}-etcd:2379'
+        - -ca
+        - /certs/ca.crt
+        - -crt
+        - /certs/server.crt
+        - -key
+        - /certs/server.key
+        image: {{ .Values.image }}
+        ports:
+          - containerPort: 443
+        volumeMounts:
+        - name: certs
+          mountPath: "/certs"
+          readOnly: true
+      volumes:
+      - name: certs
+        secret:
+          secretName: healthd
