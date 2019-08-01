@@ -41,8 +41,33 @@ type StatusUpdate struct {
     Time   int64
 }
 
-// HTTPHandler is the handlerFunc used as endpoint for receiving status updates
-func (h *Healthd) HTTPHandler(w http.ResponseWriter, r *http.Request) {
+// GETMonitorsHandler is the endpoint for reading out the endpoints which should be monitored
+func (h *Healthd) GETMonitorsHandler(w http.ResponseWriter, r *http.Request) {
+    kapi := etcdClient.NewKeysAPI(h.client)
+    ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+    resp, err := kapi.Get(ctx, "monitors", nil)
+    cancel()
+    if err != nil {
+        errStr := fmt.Sprintf("couldn't retrieve monitors from etcd, see: %v", err)
+        logrus.Error(errStr)
+        http.Error(w, errStr, http.StatusInternalServerError)
+        return
+    }
+
+    if resp == nil || resp.Node == nil {
+        errStr := "missing node in response from etcd"
+        logrus.Error(errStr)
+        http.Error(w, errStr, http.StatusInternalServerError)
+        return
+    }
+
+    val := resp.Node.Value
+    w.WriteHeader(http.StatusOK)
+    w.Write([]byte(val))
+}
+
+// POSTStatusHandler is the handlerFunc used as endpoint for receiving status updates
+func (h *Healthd) POSTStatusHandler(w http.ResponseWriter, r *http.Request) {
     agentName := r.Header.Get("X-Agent-Name")
     if agentName == "" {
         errStr := "request missing X-Agent-Name header, ignoring."

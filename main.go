@@ -87,8 +87,20 @@ func main() {
         logrus.Fatalf("couldn't create healthd service, see: %v", err)
     }
 
+    handler := func(w http.ResponseWriter, r *http.Request) {
+        if r.Method == http.MethodGet {
+            h.GETMonitorsHandler(w, r)
+        } else if r.Method == http.MethodPost {
+            h.POSTStatusHandler(w, r)
+        } else {
+            errStr := fmt.Sprintf("invalid method `%s` expected GET or POST", r.Method)
+            logrus.Error(errStr)
+            http.Error(w, errStr, http.StatusBadRequest)
+        }
+    }
+
     // Set up a /hello resource handler
-    http.HandleFunc("/", h.HTTPHandler)
+    http.HandleFunc("/", handler)
 
     // Create a Server instance to listen with the TLS config
     server := &http.Server{
