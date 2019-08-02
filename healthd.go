@@ -69,12 +69,6 @@ func (h *Healthd) GETMonitorsHandler(w http.ResponseWriter, r *http.Request) {
 // POSTStatusHandler is the handlerFunc used as endpoint for receiving status updates
 func (h *Healthd) POSTStatusHandler(w http.ResponseWriter, r *http.Request) {
     agentName := r.Header.Get("X-Agent-Name")
-    if agentName == "" {
-        errStr := "request missing X-Agent-Name header, ignoring."
-        logrus.Error(errStr)
-        http.Error(w, errStr, http.StatusBadRequest)
-        return
-    }
 
     if r.ContentLength <= 0 || r.ContentLength > 1000000 {
         errStr := fmt.Sprintf("invalid content length, expected some bytes with a max of 1mb, got `%d`", r.ContentLength)

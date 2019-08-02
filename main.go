@@ -88,6 +88,40 @@ func main() {
     }
 
     handler := func(w http.ResponseWriter, r *http.Request) {
+        agentName := r.Header.Get("X-Agent-Name")
+        if agentName == "" {
+            errStr := "request missing X-Agent-Name header, ignoring."
+            logrus.Error(errStr)
+            http.Error(w, errStr, http.StatusBadRequest)
+            return
+        }
+
+        if r.TLS == nil || len(r.TLS.PeerCertificates) == 0 {
+            errStr := "missing tls informations"
+            logrus.Error(errStr)
+            http.Error(w, errStr, http.StatusBadRequest)
+            return
+        }
+
+        foundName := false
+        if r.TLS.PeerCertificates[0].Subject.CommonName == agentName {
+            foundName = true
+        } else {
+            for _, n := range r.TLS.PeerCertificates[0].DNSNames {
+                if n == agentName {
+                    foundName = true
+                    break
+                }
+            }
+        }
+
+        if !foundName {
+            errStr := fmt.Sprintf("invalid agent name `%s` (not in CN or SANs)", agentName)
+            logrus.Error(errStr)
+            http.Error(w, errStr, http.StatusForbidden)
+            return
+        }
+
         if r.Method == http.MethodGet {
             h.GETMonitorsHandler(w, r)
         } else if r.Method == http.MethodPost {
