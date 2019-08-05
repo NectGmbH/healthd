@@ -1,4 +1,4 @@
-VERSION=0.1.3
+VERSION=0.1.4
 IMAGE=kavatech/healthd:$(VERSION)
 BUILD_FLAGS="-X main.APPVERSION=$(VERSION)"
 

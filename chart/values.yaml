@@ -1,4 +1,4 @@
-image: 'kavatech/healthd:0.1.3'
+image: 'kavatech/healthd:0.1.4'
 ca: '' #base64 encoded string
 crt: '' #base64 encoded string
 key: '' #base64 encoded string
