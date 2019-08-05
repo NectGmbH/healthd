@@ -7,7 +7,8 @@ ingressClass: 'nginx'
 affinity: {}
 
 etcd:
-  persistentVolume:
-    enabled: false
+  statefulset:
+    replicaCount: 3
 
-  affinity: {}
+  persistence:
+    enabled: false
