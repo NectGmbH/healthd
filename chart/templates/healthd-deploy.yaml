@@ -18,11 +18,11 @@ spec:
       - name: healthd
         args:
         - '-etcd'
-        - 'http://{{ .Release.Name }}-etcd-0.{{ .Release.Name }}-etcd-headless:2379'
+        - 'http://{{ .Release.Name }}-etcd-0.{{ .Release.Name }}-etcd:2379'
         - '-etcd'
-        - 'http://{{ .Release.Name }}-etcd-1.{{ .Release.Name }}-etcd-headless:2379'
+        - 'http://{{ .Release.Name }}-etcd-1.{{ .Release.Name }}-etcd:2379'
         - '-etcd'
-        - 'http://{{ .Release.Name }}-etcd-2.{{ .Release.Name }}-etcd-headless:2379'
+        - 'http://{{ .Release.Name }}-etcd-2.{{ .Release.Name }}-etcd:2379'
         - -ca
         - /certs/ca.crt
         - -crt
