@@ -8,6 +8,7 @@ affinity: {}
 
 etcd:
   persistentVolume:
-    enabled: false
+    enabled: true
+    storage: 1Gi
 
   affinity: {}
