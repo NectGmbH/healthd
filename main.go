@@ -31,20 +31,26 @@ func (i *StringSlice) Set(value string) error {
 }
 
 func main() {
-	logrus.Infof("healthd v%s", APPVERSION)
-
 	var caPath string
 	var crtPath string
 	var keyPath string
 	var etcds StringSlice
 	var httpsPort int
+	var jsonLogging bool
 
 	flag.Var(&etcds, "etcd", "etcd endpoint where status should be persisted. Multiple can be given, e.g.: -etcd localhost:2379 -etcd localhost:22379")
 	flag.StringVar(&caPath, "ca", "", "path to the ca.crt")
 	flag.StringVar(&crtPath, "crt", "", "path to the client.crt")
 	flag.StringVar(&keyPath, "key", "", "path to the client.key")
 	flag.IntVar(&httpsPort, "port", 443, "port on which the https server should listen")
+	flag.BoolVar(&jsonLogging, "json-logging", false, "Always use JSON logging")
 	flag.Parse()
+
+	if jsonLogging == true {
+		logrus.SetFormatter(&logrus.JSONFormatter{})
+	}
+
+	logrus.Infof("healthd v%s", APPVERSION)
 
 	if len(etcds) == 0 {
 		logrus.Fatal("no etcds given, pass them using -etcd")
